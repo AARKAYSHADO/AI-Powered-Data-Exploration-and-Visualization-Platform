@@ -1,0 +1,439 @@
+if session_state.title:
+
+    # Generate a unique file name based on current timestamp
+
+    if "conversation_file" not in st.session_state:
+
+        # timestamp = datetime.datetime.now().strftime("%H%M%S")
+
+        # unique_file_name = str(session_state.title)+"_"+str(timestamp)
+
+        # st.markdown(unique_file_name)
+
+        unique_file_name = session_state.title
+
+        conversation_files = os.listdir("File_path")
+
+        if conversation_files:
+
+            for file in conversation_files:
+
+                if file == session_state.title:
+
+                    timestamp = datetime.datetime.now().strftime("%H%M%S")
+
+                    unique_file_name = str(session_state.title)+"___"+str(timestamp)
+
+ 
+
+        conversation_file = os.path.join("<File_path>", unique_file_name)
+
+        st.session_state["conversation_file"] = conversation_file
+
+ 
+
+def save_conversation(conversation, conversation_file):
+
+    with open(conversation_file, 'w') as json_file:
+
+        json.dump(conversation, json_file)
+
+ 
+
+# Initialize conversation history
+
+if 'conversation_history' not in st.session_state:
+
+    st.session_state.conversation_history = []
+
+ 
+
+ 
+
+ 
+
+# Streamlit UI for chat
+
+st.set_page_config(layout="wide")
+
+st.title(":blue[SimpliAsk]")
+
+st.markdown(":grey[_You partner in analytics_]")
+
+ 
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.title(":rainbow[**SimpliAsk**]")
+
+st.sidebar.caption("*AI assistance for analytics and reporting*")
+
+st.sidebar.header("", divider="rainbow")
+
+ 
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+ 
+
+# Function to start a new conversation
+
+def start_new_conversation():
+
+    session_state.title = ""
+
+    session_state.display_history_flag = "No"
+
+    session_state.conversation_history = []  # Clear conversation history
+
+    if 'conversation_file' in st.session_state:
+
+        del st.session_state["conversation_file"]
+
+# Function to clear current chat history
+
+def clear_chat_history():
+
+    session_state.conversation_history = []
+
+    # Option to keep AI conversation history for context
+
+    session_state.conversation_history = [line for line in session_state.conversation_history if line.startswith("AI: ")]
+
+ 
+
+if session_state.title or session_state.display_history_flag == 'Yes':
+
+    if 1 == 1:
+
+        pass   
+
+    # Create a horizontal layout using columns for buttons
+
+    col1, col2 = st.sidebar.columns(2)
+
+    # Add "Start Conversation" Button in the first column
+
+    with col1:
+
+        # Create buttons with st.button
+
+        with stylable_container(
+
+            "green",
+
+            css_styles="""
+
+            button {
+
+                background-color: #3b5998;
+
+                color: white;
+
+            }""",
+
+        ):
+
+            if st.button("Start a new Conversation", key="startconv", on_click=start_new_conversation):
+
+        # if st.button("Start a Conversation", on_click=start_new_conversation):
+
+        # if button1_clicked:
+
+        #     start_new_conversation()
+
+                pass  # Prevent running the function twice
+
+ 
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+st.sidebar.markdown("")
+
+# Add the activity tab
+
+ 
+
+def load_conversation(file_path):
+
+    with open(file_path, 'r') as json_file:
+
+        conversation = json.load(json_file)
+
+    return conversation
+
+ 
+
+def display_conversation(conversation,selected_file):
+
+    session_state.title=selected_file
+
+    session_state.display_history_flag = 'Yes'
+
+    st.title(selected_file)
+
+    st.session_state.conversation_history.clear()
+
+ 
+
+    # st.session_state.conversation_history.append(f"AI: {response}")
+
+    for line in conversation:
+
+        if line.startswith("User: "):
+
+            st.session_state.conversation_history.append(f"{line}")
+
+            # user_message = st.chat_message("User")
+
+            # user_message.write(line)
+
+            # st.chat_message("user", line.replace("User: ", ""), is_user=True)
+
+           
+
+        elif line.startswith("AI: "):
+
+            st.session_state.conversation_history.append(f"{line}")
+
+            # ai_message = st.chat_message("AI")
+
+            # ai_message.write(line)
+
+            # st.chat_message("assistant", line.replace("AI: ", ""), is_user=False)
+
+ 
+
+ 
+
+def file_modified_time(file_path):
+
+    return os.path.getmtime(file_path)
+
+ 
+
+# Display sorted list of conversation files
+
+conversation_files_path = "<File_path>"
+
+conversation_files = sorted(os.listdir(conversation_files_path), key=lambda x: file_modified_time(os.path.join(conversation_files_path, x)), reverse=True)
+
+ 
+
+if conversation_files:
+
+    max_file_length = max(len(file) for file in conversation_files)
+
+else:
+
+    max_file_length = 300  # Static width value in pixels
+
+ 
+
+# Set the width of the sidebar
+
+st.markdown(f'<style>.sidebar .sidebar-content {{ width: {max_file_length}px }}</style>', unsafe_allow_html=True)
+
+ 
+
+with st.sidebar.expander("History", expanded=False):
+
+    with st.form(key='conversation_form'):
+
+        selected_file = st.radio("Select a conversation file", conversation_files)
+
+        if st.form_submit_button("Load Conversation"):
+
+            file_path = os.path.join(conversation_files_path, selected_file)
+
+            st.session_state["conversation_file"]=file_path
+
+            conversation = load_conversation(file_path)
+
+           
+
+            # Display the conversation content in the main bar/frame
+
+if session_state.display_history_flag == 'Yes':
+
+    pass
+
+else:
+
+    try:
+
+        display_conversation(conversation,selected_file)
+
+    except NameError:
+
+        pass
+
+ 
+
+    # Display the title input box
+
+if not session_state.title:
+
+    # Adjusted gradient color effect for the greeting text using Markdown and CSS
+
+    st.markdown(
+
+        f"""
+
+        <div style="display: flex; justify-content: center;">
+
+            <h1 style="text-align: center; font-size: 36px; background: linear-gradient(to right, #70a1ff 33%, #f3ff8e 40%, #ffafbd); -webkit-background-clip: text; color: transparent;">
+
+                Hello, Welcome!
+
+            </h1>
+
+        </div>
+
+        """,
+
+        unsafe_allow_html=True
+
+    )
+
+   
+
+    # Small, single-line text input box
+
+    # st.markdown("<h7 style='font-style: italic; text-align: center;'>Name your chat to maintain your history</h7>", unsafe_allow_html=True)
+
+ 
+
+    # Single-line text input box that dynamically adjusts to input length
+
+    session_state.title = st.text_input("Name your chat to maintain your history",
+
+        session_state.title,
+
+        max_chars=None  # Allowing unlimited characters
+
+    )
+
+ 
+
+ 
+
+ 
+
+# Create a copy of the image data list to avoid modifying the original
+
+image_data_list_copy = st.session_state.image_data_list.copy()
+
+ 
+
+# Display chat history using the st.chat_message() widget
+
+for line in st.session_state.conversation_history:
+
+    print(line)
+
+    if line.startswith("User: "):
+
+        user_message = st.chat_message("User")
+
+        user_message.write(line )
+
+        # st.chat_message("user", line.replace("User: ", ""), is_user=True)
+
+    elif line.startswith("AI: ") and "Output Image" not in line :
+
+        ai_message = st.chat_message("AI")
+
+        ai_message.write(line)
+
+    elif line.startswith("AI: ") and "Output Image" in line and image_data_list_copy:
+
+        ai_message = st.chat_message("AI")
+
+        # Get the image data from the copy of the list
+
+        message, image_data = image_data_list_copy.pop(0)
+
+        st.image(io.BytesIO(base64.b64decode(image_data)))
+
+        ai_message.write(message)
+
+ 
+
+if session_state.title:
+
+    if session_state.display_history_flag == 'Yes':
+
+        session_state.display_history_flag = 'No'
+
+        st.info("You can now resume chat on your past conversation")
+
+    # Use chat_input for the user to submit questions
+
+    user_input = st.chat_input("Ask a question related to data, quering, data warehouse and analysis")
+
+ 
+
+    if user_input:
+
+        # Append user input to conversation history
+
+        st.session_state.conversation_history.append(f"User: {user_input}")
+
+ 
+
+        with st.chat_message("User"):
+
+            st.markdown(user_input)
